@@ -55,25 +55,29 @@ jobs:
       - name: Generate report
         run: python3 reporter.py
 
-      # 只上传脱敏报告；data/（含明文 key）绝不上传 artifact
-      - name: Upload report
-        uses: actions/upload-artifact@v4
-        with:
-          name: findings-report
-          path: out/
-          retention-days: 30
-
+      # 不上传 artifact：完整报告含仓库/文件路径，公开仓库下任何人可下载。
+      # 只输出脱敏的 Summary（valid key 数量 + 仓库名，无 key 明文）。
       - name: Summary
         run: |
           echo "## 扫描结果" >> $GITHUB_STEP_SUMMARY
           python3 - <<'EOF'
           import json, os
           valid = 0
+          valid_repos = []
           p = 'data/verified.jsonl'
           if os.path.exists(p):
               for line in open(p):
-                  if json.loads(line).get('status') == 'valid':
+                  rec = json.loads(line)
+                  if rec.get('status') == 'valid':
                       valid += 1
-          print(f"### valid keys: **{valid}**", file=open(os.environ['GITHUB_STEP_SUMMARY'], 'a'))
-          print(f"发现 {valid} 个有效 key，见 artifacts 中的报告。如需通知，请在本地运行 notify.py（CI 不自动通知）。")
+                      valid_repos.append(rec.get('repo', '?'))
+          lines = [f"### valid keys: **{valid}**", ""]
+          if valid_repos:
+              lines.append("涉及仓库（脱敏）：")
+              for r in valid_repos:
+                  lines.append(f"- `{r}`")
+              lines.append("")
+          lines.append("如需通知，请在本仓库 secrets 配置 GITHUB_PAT 后在本地运行 notify.py（CI 不自动通知）。")
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write("\n".join(lines) + "\n")
           EOF
