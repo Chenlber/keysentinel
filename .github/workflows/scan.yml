@@ -1,0 +1,79 @@
+name: KeySentinel Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      crawl_queries:
+        description: 'Crawler 查询数（0 = 跳过采集只跑下游检测）'
+        required: false
+        default: '0'
+  schedule:
+    - cron: '30 2 * * 1'   # 每周一 02:30 UTC（北京 10:30）
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 缓存 data/：断点续跑 + 增量 crawler 的关键。
+      # key 带 run_id 保证每次 miss → 从 restore-keys 恢复最近缓存 → 结束后保存新版本。
+      - name: Cache scan data
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: keysentinel-data-${{ github.run_id }}
+          restore-keys: |
+            keysentinel-data-
+
+      - name: Crawler (incremental)
+        if: ${{ inputs.crawl_queries != '0' && inputs.crawl_queries != '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+          CRAWL_LIMIT_QUERIES: ${{ inputs.crawl_queries }}
+          CRAWL_LIMIT_PAGES: '1'
+        run: python3 crawler.py
+
+      - name: Extract keys
+        run: python3 extractor.py
+
+      - name: Verify (zero-cost)
+        run: python3 verifier.py
+
+      - name: Generate report
+        run: python3 reporter.py
+
+      # 只上传脱敏报告；data/（含明文 key）绝不上传 artifact
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-report
+          path: out/
+          retention-days: 30
+
+      - name: Summary
+        run: |
+          echo "## 扫描结果" >> $GITHUB_STEP_SUMMARY
+          python3 - <<'EOF'
+          import json, os
+          valid = 0
+          p = 'data/verified.jsonl'
+          if os.path.exists(p):
+              for line in open(p):
+                  if json.loads(line).get('status') == 'valid':
+                      valid += 1
+          print(f"### valid keys: **{valid}**", file=open(os.environ['GITHUB_STEP_SUMMARY'], 'a'))
+          print(f"发现 {valid} 个有效 key，见 artifacts 中的报告。如需通知，请在本地运行 notify.py（CI 不自动通知）。")
+          EOF

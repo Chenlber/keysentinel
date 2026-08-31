@@ -106,6 +106,25 @@ python3 notify.py
 - `reason`：验证响应详情，如可用模型列表
 - `locations`：同一 key 出现的全部仓库位置
 
+## GitHub Actions 自动化
+
+项目自带 `.github/workflows/scan.yml`，支持 CI 自动化检测：
+
+- **触发方式**：手动（Actions 页面 Run workflow）或定时（每周一 02:30 UTC）
+- **缓存断点续跑**：`data/` 通过 actions/cache 缓存，crawler 增量采集，避免每次全量 40-60 分钟
+- **参数**：手动触发时可选 `crawl_queries`（0 = 跳过采集只跑下游检测）
+- **产物**：脱敏报告 `out/` 作为 artifact 上传（30 天保留）；`data/`（含明文 key）绝不上传
+
+**需要配置的 secrets**：
+- `GITHUB_PAT`：你的 GitHub PAT（用于 crawler 的 search code API；与 .env 中同一 token 即可）
+
+**安全边界**：CI 只做检测，**不包含 notify 阶段**——发邮件/建 Issue 是不可逆动作，且 token 不应进入 CI 日志。valid key 的结果会写入 Action Summary，通知请始终在本地人工执行：
+
+```bash
+python3 notify.py          # 预览
+python3 notify.py --send   # 确认后发送
+```
+
 ## 贡献指南
 
 欢迎 PR。开发约定：
