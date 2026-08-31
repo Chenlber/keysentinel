@@ -49,7 +49,9 @@ jobs:
       - name: Extract keys
         run: python3 extractor.py
 
-      - name: Verify (zero-cost)
+      - name: Verify (zero-cost, quiet)
+        env:
+          QUIET: '1'
         run: python3 verifier.py
 
       - name: Generate report

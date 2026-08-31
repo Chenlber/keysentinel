@@ -23,6 +23,9 @@ import config
 KEYS_FILE = os.path.join(config.DATA_DIR, "keys.jsonl")
 VERIFIED_FILE = os.path.join(config.DATA_DIR, "verified.jsonl")
 
+# QUIET=1 时不打印每条明细（CI 日志安全：repo/path/hash 不进入公开日志）
+QUIET = os.environ.get("QUIET", "").strip() == "1"
+
 
 def host_of(url):
     try:
@@ -77,7 +80,8 @@ def verify_one(session, key, service):
             return "forbidden", f"{service} 403: {resp.text[:60]}"
         if resp.status_code == 429:
             wait = 5 * (2 ** attempt)
-            print(f"    [{service} 429] 退避 {wait}s", flush=True)
+            if not QUIET:
+                print(f"    [{service} 429] 退避 {wait}s", flush=True)
             time.sleep(wait)
             continue
         return "uncertain", f"{service} http {resp.status_code}: {resp.text[:60]}"
@@ -116,7 +120,8 @@ def main():
                     time.sleep(config.VERIFY_INTERVAL)
                 rec["status"], rec["reason"] = status, reason
                 stats[status] = stats.get(status, 0) + 1
-                print(f"  [{n}] {status:<9} {rec['key_hash']} {rec['repo']} {rec['path']} <- {reason}", flush=True)
+                if not QUIET:
+                    print(f"  [{n}] {status:<9} {rec['key_hash']} {rec['repo']} {rec['path']} <- {reason}", flush=True)
                 time.sleep(config.VERIFY_INTERVAL)
             out.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
