@@ -22,8 +22,8 @@ KeySentinel 扫描 GitHub 公开仓库中的 API Key（OpenAI / DeepSeek / Moons
 ## 工作流程
 
 ```
-crawler ──> extractor ──> verifier ──> reporter
-  搜索+拉取     正则提取      零消耗验证     去重+报告
+crawler ──> extractor ──> verifier ──> reporter ──> notify
+  搜索+拉取     正则提取      零消耗验证     去重+报告       邮件通知
 ```
 
 | 阶段 | 脚本 | 输入 → 输出 | 说明 |
@@ -32,6 +32,7 @@ crawler ──> extractor ──> verifier ──> reporter
 | 提取 | `extractor.py` | `raw_items.jsonl` → `data/keys.jsonl` | 四类正则提取；占位符硬过滤；官方 base_url 路由信号 |
 | 验证 | `verifier.py` | `keys.jsonl` → `data/verified.jsonl` | 多服务路由，仅调用 `GET /models` 零消耗端点 |
 | 报告 | `reporter.py` | `verified.jsonl` → `out/` | sha256 去重归并；key 掩码脱敏；按状态排序 |
+| 通知 | `notify.py` | `verified.jsonl` → SMTP 邮件 + GitHub Issue | 自动提取维护者邮箱；邮件含脱敏详情，Issue 仅隐晦提醒（不暴露 key）；默认 dry-run，`--send` 才执行 |
 
 ## 快速开始
 
@@ -51,6 +52,23 @@ python3 main.py --stage crawler # 单阶段运行
 
 # 小批试跑
 CRAWL_LIMIT_QUERIES=4 CRAWL_LIMIT_PAGES=1 python3 crawler.py
+
+# 4. 通知（可选）：邮件 + 隐晦 Issue 双通道
+# 先 dry-run 预览（不发信、不建 Issue）
+SMTP_HOST=smtp.gmail.com SMTP_PORT=465 \
+SMTP_USER=you@gmail.com SMTP_PASS=your_app_password \
+python3 notify.py
+
+# 确认无误后实际执行（发邮件 + 创建隐晦 Issue）
+... python3 notify.py --send
+# 或经 main.py
+... python3 main.py --stage notify --send
+
+# 通知策略说明：
+# - 邮件：含脱敏 key 与文件位置的完整详情，仅收件人可见
+# - Issue：只写 "仓库存在安全风险，详情见邮箱"，不暴露 key/文件/验证信息，
+#   避免给攻击者提供定向利用信号
+# - 顺序建议：先邮件（私下），维护者处理后再视情况公开
 ```
 
 ## GitHub PAT 获取（约 1 分钟）
