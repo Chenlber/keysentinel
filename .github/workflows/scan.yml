@@ -7,6 +7,10 @@ on:
         description: 'Crawler 查询数（0 = 跳过采集只跑下游检测）'
         required: false
         default: '0'
+      crawl_pages:
+        description: 'Crawler 每查询页数（1 = 浅扫 100 条/查询，10 = 全量 1000 条/查询）'
+        required: false
+        default: '10'
   schedule:
     - cron: '30 2 * * 1'   # 每周一 02:30 UTC（北京 10:30）
 
@@ -43,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           CRAWL_LIMIT_QUERIES: ${{ inputs.crawl_queries }}
-          CRAWL_LIMIT_PAGES: '1'
+          CRAWL_LIMIT_PAGES: ${{ inputs.crawl_pages }}
         run: python3 crawler.py
 
       # 下游步骤仅在输入数据存在时运行（首次运行无数据时跳过，避免 exit 1）
