@@ -65,7 +65,7 @@ We've identified a potential security concern related to this repository.
 
 Details have been sent to your email address. Please check your inbox and take appropriate action.
 
-— KeySentinel (open source, https://github.com/yourname/keysentinel)"""
+— KeySentinel (open source, https://github.com/Chenlber/keysentinel)"""
     return title, body
 
 
@@ -131,7 +131,7 @@ Recommendation:
 2. Move credentials to environment variables or a secrets manager
 3. Check git history for other leaked credentials
 
-This message was generated automatically by KeySentinel (https://github.com/yourname/keysentinel).
+This message was generated automatically by KeySentinel (https://github.com/Chenlber/keysentinel).
 If this is a false positive or you need details, reply to this email.
 
 If you find this alert helpful, it would mean a lot to us if you could star the KeySentinel project on GitHub — it helps more developers discover this kind of free, responsible leak detection.

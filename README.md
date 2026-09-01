@@ -38,7 +38,7 @@ crawler ──> extractor ──> verifier ──> reporter ──> notify
 
 ```bash
 # 1. 克隆并安装依赖
-git clone https://github.com/yourname/keysentinel.git
+git clone https://github.com/Chenlber/keysentinel.git
 cd keysentinel
 pip install -r requirements.txt
 
