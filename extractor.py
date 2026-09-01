@@ -58,7 +58,15 @@ def main():
 
     with open(RAW_FILE, encoding="utf-8") as f, open(KEYS_FILE, "w", encoding="utf-8") as out:
         for line in f:
-            rec = json.loads(line)
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError:
+                # 容忍 crawler 中断/cache 恢复产生的半行，跳过而非崩溃
+                print(f"  跳过损坏行: {line[:80]}...", file=sys.stderr)
+                continue
             content = rec.get("content", "")
             url = detect_base_url(content)
             host = host_of(url) if url else None
