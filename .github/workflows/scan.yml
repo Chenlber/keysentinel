@@ -41,7 +41,7 @@ jobs:
       - name: Crawler (incremental)
         if: ${{ inputs.crawl_queries != '0' && inputs.crawl_queries != '' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           CRAWL_LIMIT_QUERIES: ${{ inputs.crawl_queries }}
           CRAWL_LIMIT_PAGES: '1'
         run: python3 crawler.py

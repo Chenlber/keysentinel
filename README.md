@@ -116,7 +116,7 @@ python3 notify.py
 - **产物**：脱敏报告 `out/` 作为 artifact 上传（30 天保留）；`data/`（含明文 key）绝不上传
 
 **需要配置的 secrets**：
-- `GITHUB_PAT`：你的 GitHub PAT（用于 crawler 的 search code API；与 .env 中同一 token 即可）
+- `GH_PAT`：你的 GitHub PAT（用于 crawler 的 search code API；与 .env 中同一 token 即可。注意：secret 名称不能以 `GITHUB_` 开头，这是 GitHub 的保留前缀）
 
 **安全边界**：CI 只做检测，**不包含 notify 阶段**——发邮件/建 Issue 是不可逆动作，且 token 不应进入 CI 日志。valid key 的结果会写入 Action Summary，通知请始终在本地人工执行：
 
