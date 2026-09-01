@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -31,7 +31,7 @@ jobs:
       # 缓存 data/：断点续跑 + 增量 crawler 的关键。
       # key 带 run_id 保证每次 miss → 从 restore-keys 恢复最近缓存 → 结束后保存新版本。
       - name: Cache scan data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: data
           key: keysentinel-data-${{ github.run_id }}
@@ -46,20 +46,25 @@ jobs:
           CRAWL_LIMIT_PAGES: '1'
         run: python3 crawler.py
 
+      # 下游步骤仅在输入数据存在时运行（首次运行无数据时跳过，避免 exit 1）
       - name: Extract keys
+        if: hashFiles('data/raw_items.jsonl') != ''
         run: python3 extractor.py
 
       - name: Verify (zero-cost, quiet)
+        if: hashFiles('data/keys.jsonl') != ''
         env:
           QUIET: '1'
         run: python3 verifier.py
 
       - name: Generate report
+        if: hashFiles('data/verified.jsonl') != ''
         run: python3 reporter.py
 
       # 不上传 artifact：完整报告含仓库/文件路径，公开仓库下任何人可下载。
       # 只输出脱敏的 Summary（valid key 数量 + 仓库名，无 key 明文）。
       - name: Summary
+        if: always()
         run: |
           echo "## 扫描结果" >> $GITHUB_STEP_SUMMARY
           python3 - <<'EOF'
@@ -79,7 +84,9 @@ jobs:
               for r in valid_repos:
                   lines.append(f"- `{r}`")
               lines.append("")
-          lines.append("如需通知，请在本仓库 secrets 配置 GITHUB_PAT 后在本地运行 notify.py（CI 不自动通知）。")
+          if not os.path.exists('data/raw_items.jsonl'):
+              lines.append("> 首次运行且未指定采集量（crawl_queries=0），无数据。请用 crawl_queries>0 重跑采集，或等待定时任务。")
+          lines.append("如需通知，请在本地运行 notify.py（CI 不自动通知）。")
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
               f.write("\n".join(lines) + "\n")
           EOF
