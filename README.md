@@ -116,11 +116,13 @@ python3 notify.py
 - 已通知仓库：**10**
 - 已确认修复：**1**
 
-#### 已修复并公开的仓库（脱敏展示）
+#### 已修复（仓库名部分打码）
 
-| 仓库 | 文件 | Key（脱敏） | 状态 | 发现日期 |
-|---|---|---|---|---|
-| [FLD-TN/MilkteaManage_System](https://github.com/FLD-TN/MilkteaManage_System) | `src/main/java/com/appsystem/milkteamanage_system/AdminPage/Chatbot.java` | `sk-915***5617` | 欠费 | 2026-09-02 |
+| 仓库 | Key（脱敏） | 状态 | 发现日期 |
+|---|---|---|---|
+| `FL***TN/Mil***em` | `sk-915***5617` | 欠费 | 2026-09-02 |
+
+> 仓库名做了部分打码：维护者可凭首尾字符认出自己的仓库，但外部无法通过搜索精确定位。文件路径不公开。
 
 #### 已通知待修复（仅展示哈希，保护维护者）
 

@@ -46,6 +46,29 @@ def load_json(path, default):
         return default
 
 
+def obfuscate_repo(repo):
+    """仓库名部分打码：主人能认出自己，外人无法精确搜索定位。
+
+    规则：
+      owner  -> 首 2 字符 + *** + 末 1 字符    如 FLD-TN   -> FL***N
+      仓库名 -> 首 3 字符 + *** + 末 2 字符    如 MilkteaManage_System -> Mil***em
+    这样 GitHub 搜索无法命中完整仓库名，但维护者一眼可辨。
+    """
+    if not repo or "/" not in repo:
+        return repo or ""
+    owner, _, name = repo.partition("/")
+
+    def mask_part(s, head, tail):
+        # 短名称（<=6 字符）保留首尾各 2 字符，保证主人仍可辨识
+        if len(s) <= 6:
+            if len(s) <= 4:
+                return s[0] + "***" + s[-1] if len(s) >= 3 else s
+            return s[:2] + "***" + s[-2:]
+        return s[:head] + "***" + s[-tail:]
+
+    return f"{mask_part(owner, 2, 1)}/{mask_part(name, 3, 2)}"
+
+
 def build_section(data, fixed_repos):
     total = data.get("total_valid", 0)
     items = data.get("items", [])
@@ -72,20 +95,26 @@ def build_section(data, fixed_repos):
 
     can_decrypt = not any(looks_encrypted(v.get("repo")) for v in items)
     if fixed_items and can_decrypt:
-        lines.append("#### 已修复并公开的仓库（脱敏展示）")
+        lines.append("#### 已修复（仓库名部分打码）")
         lines.append("")
-        lines.append("| 仓库 | 文件 | Key（脱敏） | 状态 | 发现日期 |")
-        lines.append("|---|---|---|---|---|")
+        lines.append("| 仓库 | Key（脱敏） | 状态 | 发现日期 |")
+        lines.append("|---|---|---|---|")
         for v in fixed_items:
-            repo = f"[{v['repo']}](https://github.com/{v['repo']})"
+            # 打码显示，且不附链接（链接会暴露完整仓库名）
+            repo = obfuscate_repo(v["repo"])
             billing = (
                 "欠费" if v.get("billing") == "billing"
                 else ("可用" if v.get("billing") == "ok" else "待核")
             )
             lines.append(
-                f"| {repo} | `{v.get('path','')}` | `{v.get('key_masked','')}` "
+                f"| `{repo}` | `{v.get('key_masked','')}` "
                 f"| {billing} | {v.get('discovered_at','')} |"
             )
+        lines.append("")
+        lines.append(
+            "> 仓库名做了部分打码：维护者可凭首尾字符认出自己的仓库，"
+            "但外部无法通过搜索精确定位。文件路径不公开。"
+        )
         lines.append("")
     elif fixed_items and not can_decrypt:
         # 有已修复仓库但无法解密 → 只报数量，绝不把密文写进 README
