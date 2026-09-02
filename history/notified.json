@@ -1,0 +1,85 @@
+{
+  "updated_at": "2026-09-02 11:36",
+  "notified": [
+    {
+      "key_hash": "18fc1c86d2f64dc9",
+      "repo": "FLD-TN/MilkteaManage_System",
+      "path": "src/main/java/com/appsystem/milkteamanage_system/AdminPage/Chatbot.java",
+      "key_masked": "sk-915***5617",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "c07e65b3313e2319",
+      "repo": "abhiram-120/ec2-code",
+      "path": "src/controller/mobile/questionBank.controller.js",
+      "key_masked": "sk-050***ae43",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "773819a7798bb2f7",
+      "repo": "yzhsuisuis/ChatGPT-sdk-java",
+      "path": "src/test/java/cn/bugstack/chatgpt/test/ApiTest.java",
+      "key_masked": "sk-a3b***6ff8",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "e4a99c6a2f30f9d9",
+      "repo": "abdullahktk760/transcription",
+      "path": "config/prism.php",
+      "key_masked": "sk-593***5d82",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "1b75aacbc3f1cf85",
+      "repo": "tabrej-the-developer/mydiaree",
+      "path": "application/controllers/Observation.php",
+      "key_masked": "sk-d1f***be5c",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "8075b527fb368a49",
+      "repo": "JawherBalti/wbcc_extranet",
+      "path": "app/libraries/test.php",
+      "key_masked": "sk-4c8***ac1e",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "5975e718b17f488f",
+      "repo": "Abdallah-Salah7/Graduation-Project",
+      "path": "Aoun.BLL/Services/Chat/AISmartService.cs",
+      "key_masked": "sk-134***54c7",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "e1e03d0261314623",
+      "repo": "fsawadogo/sqordia-repo",
+      "path": "Planhop4.8/Helper/AIHelper.cs",
+      "key_masked": "sk-30e***0878",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "43d3d342a8f6dc30",
+      "repo": "mac383/Utemy",
+      "path": "Salam-Hack-Back-End/Api_Layer/Util/GptService.cs",
+      "key_masked": "sk-087***c24d",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    },
+    {
+      "key_hash": "a3eec563fbed833c",
+      "repo": "RobertAlexBarbu/RestaurantMenuApp",
+      "path": "WebAPI/WebAPI/Program.cs",
+      "key_masked": "sk-2b0***67a3",
+      "notified_at": "2026-09-02",
+      "channels": "mail+issue"
+    }
+  ]
+}

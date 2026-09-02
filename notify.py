@@ -10,12 +10,15 @@
 
 SMTP 配置全部走环境变量，不落盘：
   SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS / SMTP_FROM
-可选覆盖收件人：MAIL_TO（默认自动从 GitHub 提取）
+可选覆盖收件人：MAIL_TO（全局）、MAIL_TO_REPOS（按仓库）
+防重复：history/notified.json 记录已通知 key，默认同一 key 只通知一次；
+  设置 RENOTIFY_DAYS=90 可在 90 天后重发（仍未修复时提醒）。
 """
 import json
 import os
 import smtplib
 import sys
+from datetime import datetime
 from email.mime.text import MIMEText
 from email.header import Header
 
@@ -40,6 +43,51 @@ for _kv in os.environ.get("MAIL_TO_REPOS", "").split(","):
         MAIL_TO_REPOS[_repo.strip()] = _email.strip()
 # 跳过的仓库（逗号分隔，如 SKIP_REPOS="a/b,c/d"）
 SKIP_REPOS = {r.strip() for r in os.environ.get("SKIP_REPOS", "").split(",") if r.strip()}
+
+# 已通知记录：防止重复骚扰同一仓库/key
+HISTORY_DIR = os.path.join(config.BASE_DIR, "history")
+NOTIFIED_JSON = os.path.join(HISTORY_DIR, "notified.json")
+# 同一 key 默认只在首次通知；间隔天数内不重发
+RENOTIFY_DAYS = int(os.environ.get("RENOTIFY_DAYS", "0") or 0)
+
+
+def load_notified():
+    """返回 {key_hash: {repo, notified_at, status}}"""
+    if not os.path.exists(NOTIFIED_JSON):
+        return {}
+    try:
+        with open(NOTIFIED_JSON, encoding="utf-8") as f:
+            data = json.load(f)
+        return {r["key_hash"]: r for r in data.get("notified", [])}
+    except Exception:
+        return {}
+
+
+def save_notified(notified):
+    os.makedirs(HISTORY_DIR, exist_ok=True)
+    payload = {
+        "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "notified": list(notified.values()),
+    }
+    with open(NOTIFIED_JSON, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+
+def should_notify(rec, notified):
+    """判断是否需要通知（默认同一 key_hash 只通知一次）。"""
+    h = rec["key_hash"]
+    if h not in notified:
+        return True, "首次"
+    if RENOTIFY_DAYS <= 0:
+        return False, "已通知过"
+    prev = notified[h].get("notified_at", "")
+    try:
+        days = (datetime.now() - datetime.strptime(prev, "%Y-%m-%d")).days
+    except Exception:
+        return True, "记录异常，重发"
+    if days >= RENOTIFY_DAYS:
+        return True, f"距上次 {days} 天"
+    return False, f"{RENOTIFY_DAYS - days} 天内已通知"
 
 
 def mask(key):
@@ -179,6 +227,7 @@ def main():
         sys.exit(1)
 
     session = requests.Session()
+    notified = load_notified()
     valid_recs = []
     with open(VERIFIED_FILE, encoding="utf-8") as f:
         for line in f:
@@ -190,9 +239,18 @@ def main():
         print("没有 valid 的 key，无需通知。")
         return
 
-    print(f"待通知 {len(valid_recs)} 条 valid key\n")
+    print(f"发现 {len(valid_recs)} 条 valid key")
+    print(f"已通知记录 {len(notified)} 条（history/notified.json）\n")
     sent_mail = sent_issue = 0
+    skipped = 0
     for rec in valid_recs:
+        need, reason = should_notify(rec, notified)
+        if not need:
+            print(f"=== {rec['repo']} ===")
+            print(f"  [SKIP] {reason}，避免重复骚扰")
+            print()
+            skipped += 1
+            continue
         to_addr = (
             MAIL_TO_REPOS.get(rec["repo"])
             or MAIL_TO_OVERRIDE
@@ -220,14 +278,30 @@ def main():
             print("  标题: " + issue_title)
             print("  正文: " + issue_body.replace("\n", " | "))
         else:
-            if send_mail(msg):
+            mail_ok = send_mail(msg)
+            issue_ok = create_issue(rec["repo"], issue_title, issue_body)
+            if mail_ok:
                 print(f"  [SENT] 邮件已发送 → {to_addr}")
                 sent_mail += 1
-            if create_issue(rec["repo"], issue_title, issue_body):
+            if issue_ok:
                 print(f"  [SENT] Issue 已创建 → {rec['repo']}")
                 sent_issue += 1
+            # 任一渠道成功则记录，避免下次重复
+            if mail_ok or issue_ok:
+                notified[rec["key_hash"]] = {
+                    "key_hash": rec["key_hash"],
+                    "repo": rec["repo"],
+                    "path": rec["path"],
+                    "key_masked": mask(rec["key"]),
+                    "notified_at": datetime.now().strftime("%Y-%m-%d"),
+                    "channels": ("mail+issue" if mail_ok and issue_ok
+                                 else ("mail" if mail_ok else "issue")),
+                }
         print()
-    print(f"完成：{'dry-run（未实际发送）' if dry_run else f'邮件 {sent_mail} 封, Issue {sent_issue} 个'}")
+    if not dry_run and (sent_mail or sent_issue):
+        save_notified(notified)
+        print(f"已更新通知记录（history/notified.json，共 {len(notified)} 条）")
+    print(f"完成：{'dry-run（未实际发送）' if dry_run else f'邮件 {sent_mail} 封, Issue {sent_issue} 个'}，跳过重复 {skipped} 条")
 
 
 if __name__ == "__main__":

@@ -94,15 +94,19 @@ jobs:
                   if rec.get('status') == 'valid':
                       valid += 1
                       valid_repos.append(rec.get('repo', '?'))
+          import hashlib
           lines = [f"### valid keys: **{valid}**", ""]
           if valid_repos:
-              lines.append("涉及仓库（脱敏）：")
+              lines.append("涉及仓库（sha256 前 8 位，保护维护者）：")
               for r in valid_repos:
-                  lines.append(f"- `{r}`")
+                  rh = hashlib.sha256(r.encode()).hexdigest()[:8]
+                  lines.append(f"- `{rh}`")
+              lines.append("")
+              lines.append("> 仓库名不在公开日志中暴露；完整数据在本地 data/（不上传）。")
               lines.append("")
           if not os.path.exists('data/raw_items.jsonl'):
               lines.append("> 首次运行且未指定采集量（crawl_queries=0），无数据。请用 crawl_queries>0 重跑采集，或等待定时任务。")
-          lines.append("如需通知，请在本地运行 notify.py（CI 不自动通知）。")
+          lines.append("如需通知，请在本地运行 notify.py，或在 Actions 手动触发 notify workflow（需审批）。")
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
               f.write("\n".join(lines) + "\n")
           EOF

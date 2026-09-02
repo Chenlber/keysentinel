@@ -111,23 +111,34 @@ python3 notify.py
 
 ### 已发现的有效 key（自动更新）
 
-**累计发现 10 个有效 key**（零消耗验证，脱敏展示）
+**累计发现 10 个有效 key**（零消耗验证）
+
+- 已通知仓库：**10**
+- 已确认修复：**1**
+
+#### 已修复并公开的仓库（脱敏展示）
 
 | 仓库 | 文件 | Key（脱敏） | 状态 | 发现日期 |
 |---|---|---|---|---|
 | [FLD-TN/MilkteaManage_System](https://github.com/FLD-TN/MilkteaManage_System) | `src/main/java/com/appsystem/milkteamanage_system/AdminPage/Chatbot.java` | `sk-915***5617` | 欠费 | 2026-09-02 |
-| [abhiram-120/ec2-code](https://github.com/abhiram-120/ec2-code) | `src/controller/mobile/questionBank.controller.js` | `sk-050***ae43` | 欠费 | 2026-09-02 |
-| [yzhsuisuis/ChatGPT-sdk-java](https://github.com/yzhsuisuis/ChatGPT-sdk-java) | `src/test/java/cn/bugstack/chatgpt/test/ApiTest.java` | `sk-a3b***6ff8` | 欠费 | 2026-09-02 |
-| [abdullahktk760/transcription](https://github.com/abdullahktk760/transcription) | `config/prism.php` | `sk-593***5d82` | 欠费 | 2026-09-02 |
-| [tabrej-the-developer/mydiaree](https://github.com/tabrej-the-developer/mydiaree) | `application/controllers/Observation.php` | `sk-d1f***be5c` | 欠费 | 2026-09-02 |
-| [JawherBalti/wbcc_extranet](https://github.com/JawherBalti/wbcc_extranet) | `app/libraries/test.php` | `sk-4c8***ac1e` | 欠费 | 2026-09-02 |
-| [Abdallah-Salah7/Graduation-Project](https://github.com/Abdallah-Salah7/Graduation-Project) | `Aoun.BLL/Services/Chat/AISmartService.cs` | `sk-134***54c7` | 欠费 | 2026-09-02 |
-| [fsawadogo/sqordia-repo](https://github.com/fsawadogo/sqordia-repo) | `Planhop4.8/Helper/AIHelper.cs` | `sk-30e***0878` | 欠费 | 2026-09-02 |
-| [mac383/Utemy](https://github.com/mac383/Utemy) | `Salam-Hack-Back-End/Api_Layer/Util/GptService.cs` | `sk-087***c24d` | 欠费 | 2026-09-02 |
-| [RobertAlexBarbu/RestaurantMenuApp](https://github.com/RobertAlexBarbu/RestaurantMenuApp) | `WebAPI/WebAPI/Program.cs` | `sk-2b0***67a3` | 欠费 | 2026-09-02 |
 
-*数据源：`history/valid_keys.json`，由 `update_history.py` 生成。*
+#### 已通知待修复（仅展示哈希，保护维护者）
 
+| 仓库哈希 | Key（脱敏） | 状态 | 通知日期 |
+|---|---|---|---|
+| `4213c991` | `sk-050***ae43` | 欠费 | 2026-09-02 |
+| `9bdb45aa` | `sk-a3b***6ff8` | 欠费 | 2026-09-02 |
+| `05425853` | `sk-593***5d82` | 欠费 | 2026-09-02 |
+| `6c5df4fe` | `sk-d1f***be5c` | 欠费 | 2026-09-02 |
+| `e6315459` | `sk-4c8***ac1e` | 欠费 | 2026-09-02 |
+| `012d59da` | `sk-134***54c7` | 欠费 | 2026-09-02 |
+| `ab4a4e87` | `sk-30e***0878` | 欠费 | 2026-09-02 |
+| `72a24c35` | `sk-087***c24d` | 欠费 | 2026-09-02 |
+| `39c33465` | `sk-2b0***67a3` | 欠费 | 2026-09-02 |
+
+> 另有 **9** 个仓库已通知但尚未确认修复。按负责任披露原则，未修复前仅展示仓库名哈希（sha256 前 8 位），不公开仓库名与文件路径。维护者确认修复后（key 已撤销）将公开其仓库名。
+
+*数据源：`history/valid_keys.json`；更新时间：2026-09-02*
 <!-- KEYS_END -->
 
 ## GitHub Actions 自动化

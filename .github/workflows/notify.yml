@@ -1,0 +1,102 @@
+name: KeySentinel Notify
+
+# 自动触发（每周一 03:30 UTC，在 scan.yml 采集检测之后）
+# 防护：
+# - 仅 schedule / workflow_dispatch 触发，绝不加 pull_request（防外部滥用）
+# - job 绑定 environment: notify-approval，需人工审批才执行
+#   （Settings → Environments → 新建 notify-approval → 添加 Required reviewers）
+on:
+  schedule:
+    - cron: '30 3 * * 1'
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "输入 SEND 以确认执行通知（邮件 + Issue 均为不可逆操作）"
+        required: true
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  notify:
+    # 关键安全关卡：environment 需人工审批（即使定时触发也会暂停等待批准）
+    environment: notify-approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 恢复检测产物（含 data/verified.jsonl）
+      - name: Restore scan data
+        uses: actions/cache@v5
+        with:
+          path: data
+          key: keysentinel-data-${{ github.run_id }}
+          restore-keys: |
+            keysentinel-data-
+
+      - name: Guard - require SEND on manual run
+        if: github.event_name == 'workflow_dispatch' && inputs.confirm != 'SEND'
+        run: |
+          echo "手动触发需输入 SEND 确认，当前为 '${{ inputs.confirm }}'，中止。"
+          exit 1
+
+      # 通知前重新验证，确保 key 仍有效（避免基于陈旧数据误通知）
+      - name: Re-verify before notify
+        if: hashFiles('data/keys.jsonl') != ''
+        env:
+          QUIET: '1'
+        run: python3 verifier.py
+
+      - name: Only proceed if valid keys exist
+        id: check
+        run: |
+          N=$(python3 -c "
+          import json, os
+          n = 0
+          if os.path.exists('data/verified.jsonl'):
+              for line in open('data/verified.jsonl'):
+                  if json.loads(line).get('status') == 'valid':
+                      n += 1
+          print(n)
+          ")
+          echo "valid_count=$N" >> $GITHUB_OUTPUT
+          echo "有效 key 数量: $N"
+
+      # 发送邮件 + 创建 Issue（notify.py 内部有防重复机制）
+      - name: Notify maintainers
+        if: steps.check.outputs.valid_count != '0'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: '465'
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          QUIET: '1'
+        run: python3 notify.py --send
+
+      # 更新通知记录（history/notified.json）并 commit 回仓库
+      - name: Commit notified history
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add history/
+          git diff --cached --quiet || git commit -m "chore: update notified history [skip ci]"
+          git push origin HEAD:${GITHUB_REF_NAME}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 通知执行结果" >> $GITHUB_STEP_SUMMARY
+          echo "有效 key: ${{ steps.check.outputs.valid_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "已通知记录见 history/notified.json（仓库名哈希，日志不暴露仓库名）。" >> $GITHUB_STEP_SUMMARY

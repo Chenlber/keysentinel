@@ -22,6 +22,12 @@ def mask(key):
     return key[:6] + "***" + key[-4:]
 
 
+def repo_hash(repo):
+    """仓库名 sha256 前 8 位：公开展示用，无法反推仓库名。"""
+    import hashlib
+    return hashlib.sha256(repo.encode("utf-8")).hexdigest()[:8]
+
+
 def main():
     if not os.path.exists(os.path.join(config.DATA_DIR, "verified.jsonl")):
         print("缺少 data/verified.jsonl，请先运行 verifier.py。", file=sys.stderr)
@@ -45,6 +51,7 @@ def main():
             h = r["key_hash"]
             valid.append({
                 "repo": r["repo"],
+                "repo_hash": repo_hash(r["repo"]),
                 "path": r["path"],
                 "key_masked": mask(r["key"]),
                 "html_url": r.get("html_url", ""),

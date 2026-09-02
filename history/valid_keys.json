@@ -1,9 +1,10 @@
 {
-  "generated_at": "2026-09-02 11:12",
+  "generated_at": "2026-09-02 12:48",
   "total_valid": 10,
   "items": [
     {
       "repo": "FLD-TN/MilkteaManage_System",
+      "repo_hash": "d9067f0c",
       "path": "src/main/java/com/appsystem/milkteamanage_system/AdminPage/Chatbot.java",
       "key_masked": "sk-915***5617",
       "html_url": "https://github.com/FLD-TN/MilkteaManage_System/blob/dc253311ad3ec129a0324ffe5ad31bcc1a12615d/src/main/java/com/appsystem/milkteamanage_system/AdminPage/Chatbot.java",
@@ -12,6 +13,7 @@
     },
     {
       "repo": "abhiram-120/ec2-code",
+      "repo_hash": "4213c991",
       "path": "src/controller/mobile/questionBank.controller.js",
       "key_masked": "sk-050***ae43",
       "html_url": "https://github.com/abhiram-120/ec2-code/blob/72b4870932a1d237646b6cf563d8a227a824d536/src/controller/mobile/questionBank.controller.js",
@@ -20,6 +22,7 @@
     },
     {
       "repo": "yzhsuisuis/ChatGPT-sdk-java",
+      "repo_hash": "9bdb45aa",
       "path": "src/test/java/cn/bugstack/chatgpt/test/ApiTest.java",
       "key_masked": "sk-a3b***6ff8",
       "html_url": "https://github.com/yzhsuisuis/ChatGPT-sdk-java/blob/891bda8c45404eccdc0af465b4bae9904feb42d4/src/test/java/cn/bugstack/chatgpt/test/ApiTest.java",
@@ -28,6 +31,7 @@
     },
     {
       "repo": "abdullahktk760/transcription",
+      "repo_hash": "05425853",
       "path": "config/prism.php",
       "key_masked": "sk-593***5d82",
       "html_url": "https://github.com/abdullahktk760/transcription/blob/e03ee27946cf31e87e808fd1fc2564bcdbbada22/config/prism.php",
@@ -36,6 +40,7 @@
     },
     {
       "repo": "tabrej-the-developer/mydiaree",
+      "repo_hash": "6c5df4fe",
       "path": "application/controllers/Observation.php",
       "key_masked": "sk-d1f***be5c",
       "html_url": "https://github.com/tabrej-the-developer/mydiaree/blob/6f41e85aee64573c5eab7c0fad34cda84e71ffd3/application/controllers/Observation.php",
@@ -44,6 +49,7 @@
     },
     {
       "repo": "JawherBalti/wbcc_extranet",
+      "repo_hash": "e6315459",
       "path": "app/libraries/test.php",
       "key_masked": "sk-4c8***ac1e",
       "html_url": "https://github.com/JawherBalti/wbcc_extranet/blob/7c37af627453af010558eb6668614074e7b64a69/app/libraries/test.php",
@@ -52,6 +58,7 @@
     },
     {
       "repo": "Abdallah-Salah7/Graduation-Project",
+      "repo_hash": "012d59da",
       "path": "Aoun.BLL/Services/Chat/AISmartService.cs",
       "key_masked": "sk-134***54c7",
       "html_url": "https://github.com/Abdallah-Salah7/Graduation-Project/blob/b9d1ed87c67348dd4c7d76b49f50544d44bb0f27/Aoun.BLL/Services/Chat/AISmartService.cs",
@@ -60,6 +67,7 @@
     },
     {
       "repo": "fsawadogo/sqordia-repo",
+      "repo_hash": "ab4a4e87",
       "path": "Planhop4.8/Helper/AIHelper.cs",
       "key_masked": "sk-30e***0878",
       "html_url": "https://github.com/fsawadogo/sqordia-repo/blob/fe01128c755f369c27690a4b11f65094a28e8e68/Planhop4.8/Helper/AIHelper.cs",
@@ -68,6 +76,7 @@
     },
     {
       "repo": "mac383/Utemy",
+      "repo_hash": "72a24c35",
       "path": "Salam-Hack-Back-End/Api_Layer/Util/GptService.cs",
       "key_masked": "sk-087***c24d",
       "html_url": "https://github.com/mac383/Utemy/blob/1aff45a9d8401707e69185b17c19ff2f0ed4e5db/Salam-Hack-Back-End/Api_Layer/Util/GptService.cs",
@@ -76,6 +85,7 @@
     },
     {
       "repo": "RobertAlexBarbu/RestaurantMenuApp",
+      "repo_hash": "39c33465",
       "path": "WebAPI/WebAPI/Program.cs",
       "key_masked": "sk-2b0***67a3",
       "html_url": "https://github.com/RobertAlexBarbu/RestaurantMenuApp/blob/bc873264219880f724ea780ef44a636880fea6ff/WebAPI/WebAPI/Program.cs",
