@@ -234,8 +234,9 @@ def send_mail(msg):
         return False
 
 
-def main():
-    dry_run = "--send" not in sys.argv
+def main(send=None):
+    """send=None 时从命令行 --send 判断；main.py 可直接传 send=True/False。"""
+    dry_run = (not send) if send is not None else ("--send" not in sys.argv)
     if not os.path.exists(VERIFIED_FILE):
         print("缺少 data/verified.jsonl，请先运行 verifier.py。", file=sys.stderr)
         sys.exit(1)
