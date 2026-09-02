@@ -26,9 +26,9 @@ import time
 
 import requests
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
-from verifier import build_candidates, VERIFIED_FILE
+from core.verifier import build_candidates, VERIFIED_FILE
 
 BILLING_FILE = os.path.join(config.DATA_DIR, "billing.jsonl")
 

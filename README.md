@@ -28,12 +28,12 @@ crawler ──> extractor ──> verifier ──> billing ──> reporter ─�
 
 | 阶段 | 脚本 | 输入 → 输出 | 说明 |
 |---|---|---|---|
-| 采集 | `crawler.py` | → `data/raw_items.jsonl` | 关键词 x 语言分片搜索，突破单查询 4000 仓库限制；限速 + 退避重试；断点续跑 |
-| 提取 | `extractor.py` | `raw_items.jsonl` → `data/keys.jsonl` | 四类正则提取；占位符硬过滤；官方 base_url 路由信号 |
-| 验证 | `verifier.py` | `keys.jsonl` → `data/verified.jsonl` | 多服务路由，仅调用 `GET /models` 零消耗端点 |
-| 欠费确认 | `billing_check.py` | `verified.jsonl`(valid) → `data/billing.jsonl` | 对 valid key 发送单条"你好"（`max_tokens=1`），区分 ok / billing（欠费）/ invalid；支持 `--key` 手动指定 |
-| 报告 | `reporter.py` | `verified.jsonl` → `out/` | sha256 去重归并；key 掩码脱敏；按状态排序 |
-| 通知 | `notify.py` | `verified.jsonl` → SMTP 邮件 + GitHub Issue | 自动提取维护者邮箱；邮件含脱敏详情，Issue 仅隐晦提醒（不暴露 key）；默认 dry-run，`--send` 才执行 |
+| 采集 | `core/crawler.py` | → `data/raw_items.jsonl` | 关键词 x 语言分片搜索，突破单查询 4000 仓库限制；限速 + 退避重试；断点续跑 |
+| 提取 | `core/extractor.py` | `raw_items.jsonl` → `data/keys.jsonl` | 四类正则提取；占位符硬过滤；官方 base_url 路由信号 |
+| 验证 | `core/verifier.py` | `keys.jsonl` → `data/verified.jsonl` | 多服务路由，仅调用 `GET /models` 零消耗端点 |
+| 欠费确认 | `core/billing.py` | `verified.jsonl`(valid) → `data/billing.jsonl` | 对 valid key 发送单条"你好"（`max_tokens=1`），区分 ok / billing（欠费）/ invalid；支持 `--key` 手动指定 |
+| 报告 | `core/reporter.py` | `verified.jsonl` → `out/` | sha256 去重归并；key 掩码脱敏；按状态排序 |
+| 通知 | `core/notify.py` | `verified.jsonl` → SMTP 邮件 + GitHub Issue | 自动提取维护者邮箱；邮件含脱敏详情，Issue 仅隐晦提醒（不暴露 key）；默认 dry-run，`--send` 才执行 |
 
 ## 快速开始
 
@@ -52,16 +52,16 @@ python3 main.py                 # 全量（22 查询，约 40-60 分钟）
 python3 main.py --stage crawler # 单阶段运行
 
 # 小批试跑
-CRAWL_LIMIT_QUERIES=4 CRAWL_LIMIT_PAGES=1 python3 crawler.py
+CRAWL_LIMIT_QUERIES=4 CRAWL_LIMIT_PAGES=1 python3 -m core.crawler
 
 # 4. 通知（可选）：邮件 + 隐晦 Issue 双通道
 # 先 dry-run 预览（不发信、不建 Issue）
 SMTP_HOST=smtp.gmail.com SMTP_PORT=465 \
 SMTP_USER=you@gmail.com SMTP_PASS=your_app_password \
-python3 notify.py
+python3 -m core.notify
 
 # 确认无误后实际执行（发邮件 + 创建隐晦 Issue）
-... python3 notify.py --send
+... python3 -m core.notify --send
 # 或经 main.py
 ... python3 main.py --stage notify --send
 
@@ -157,8 +157,8 @@ python3 notify.py
 **安全边界**：CI 只做检测，**不包含 notify 阶段**——发邮件/建 Issue 是不可逆动作，且 token 不应进入 CI 日志。valid key 的结果会写入 Action Summary，通知请始终在本地人工执行：
 
 ```bash
-python3 notify.py          # 预览
-python3 notify.py --send   # 确认后发送
+python3 -m core.notify          # 预览
+python3 -m core.notify --send   # 确认后发送
 ```
 
 ## 贡献指南
@@ -175,7 +175,7 @@ python3 notify.py --send   # 确认后发送
 ```bash
 # 小批验证（不改 crawler 逻辑时）：
 # 修改后只需重跑 extractor → verifier → billing → reporter
-python3 extractor.py && python3 verifier.py && python3 billing_check.py && python3 reporter.py
+python3 -m core.extractor && python3 -m core.verifier && python3 -m core.billing && python3 -m core.reporter
 ```
 
 ## 免责声明

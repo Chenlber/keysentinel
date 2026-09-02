@@ -11,7 +11,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 
 VERIFIED_FILE = os.path.join(config.DATA_DIR, "verified.jsonl")

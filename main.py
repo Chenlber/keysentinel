@@ -21,14 +21,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import billing_check
-import crawler
-import extractor
-import notify
-import reporter
-import update_history
-import update_readme
-import verifier
+from core import billing, crawler, extractor, history, notify, readme, reporter, verifier
 
 STAGES = ["crawler", "extractor", "verifier", "billing", "reporter",
           "history", "readme", "notify"]
@@ -37,10 +30,10 @@ MODULES = {
     "crawler": crawler,
     "extractor": extractor,
     "verifier": verifier,
-    "billing": billing_check,
+    "billing": billing,
     "reporter": reporter,
-    "history": update_history,
-    "readme": update_readme,
+    "history": history,
+    "readme": readme,
     "notify": notify,
 }
 

@@ -15,7 +15,7 @@ __pycache__/
 nohup.out
 
 # 本地解密工具（不入库：避免暴露解密流程，且仅供本机使用）
-decrypt_view.py
+tools/decrypt_view.py
 
 # 编辑器/系统
 .DS_Store

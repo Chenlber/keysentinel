@@ -55,7 +55,7 @@ jobs:
         if: hashFiles('data/keys.jsonl') != ''
         env:
           QUIET: '1'
-        run: python3 verifier.py
+        run: python3 -m core.verifier
 
       - name: Only proceed if valid keys exist
         id: check
@@ -84,7 +84,7 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           QUIET: '1'
-        run: python3 notify.py --send
+        run: python3 -m core.notify --send
 
       # 更新通知记录（history/notified.json）并 commit 回仓库
       - name: Commit notified history

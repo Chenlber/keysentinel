@@ -11,7 +11,7 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 
 RAW_FILE = os.path.join(config.DATA_DIR, "raw_items.jsonl")

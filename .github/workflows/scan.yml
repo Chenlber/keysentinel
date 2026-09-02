@@ -48,22 +48,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           CRAWL_LIMIT_QUERIES: ${{ inputs.crawl_queries }}
           CRAWL_LIMIT_PAGES: ${{ inputs.crawl_pages }}
-        run: python3 crawler.py
+        run: python3 -m core.crawler
 
       # 下游步骤仅在输入数据存在时运行（首次运行无数据时跳过，避免 exit 1）
       - name: Extract keys
         if: hashFiles('data/raw_items.jsonl') != ''
-        run: python3 extractor.py
+        run: python3 -m core.extractor
 
       - name: Verify (zero-cost, quiet)
         if: hashFiles('data/keys.jsonl') != ''
         env:
           QUIET: '1'
-        run: python3 verifier.py
+        run: python3 -m core.verifier
 
       - name: Generate report
         if: hashFiles('data/verified.jsonl') != ''
-        run: python3 reporter.py
+        run: python3 -m core.reporter
 
       # 更新历史汇总与 README 动态区块，commit 回仓库
       # KEYSTORE_PASSPHRASE：加密 history/valid_keys.json 中的 repo/path/html_url
@@ -72,8 +72,8 @@ jobs:
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
         run: |
-          python3 update_history.py
-          python3 update_readme.py
+          python3 -m core.history
+          python3 -m core.readme
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add history/valid_keys.json README.md
