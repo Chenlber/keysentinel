@@ -9,9 +9,13 @@
 - 仓库名仅在"已确认修复"后展示（见 history/fixed_repos.json）
 - 未修复的仓库不暴露仓库名/文件路径，避免给攻击者提供定向情报
 
+数据源 history/valid_keys.json 中 repo/path/html_url 为加密存储，
+读取时用 KEYSTORE_PASSPHRASE 解密（未设置则按明文处理，兼容历史数据）。
+
 用法:
   python3 update_readme.py
 """
+import hashlib
 import json
 import os
 import sys
@@ -19,6 +23,9 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import config
+import crypto_util as crypto
+
+SENSITIVE_FIELDS = ("repo", "path", "html_url")
 
 README = os.path.join(config.BASE_DIR, "README.md")
 HISTORY_DIR = os.path.join(config.BASE_DIR, "history")
@@ -42,7 +49,12 @@ def load_json(path, default):
 def build_section(data, fixed_repos):
     total = data.get("total_valid", 0)
     items = data.get("items", [])
-    fixed_set = {r["repo"] for r in fixed_repos.get("repos", []) if r.get("repo")}
+    # 用 repo_hash 匹配（不受加密影响，无口令时也能正确识别已修复仓库）
+    fixed_set = {r.get("repo_hash") for r in fixed_repos.get("repos", []) if r.get("repo_hash")}
+    # 兼容旧格式：fixed_repos.json 里只有 repo 时，现场算 hash
+    for r in fixed_repos.get("repos", []):
+        if r.get("repo") and not r.get("repo_hash"):
+            fixed_set.add(hashlib.sha256(r["repo"].encode("utf-8")).hexdigest()[:8])
 
     lines = [MARKER_START, "", "### 已发现的有效 key（自动更新）", ""]
     lines.append(f"**累计发现 {total} 个有效 key**（零消耗验证）")
@@ -51,8 +63,15 @@ def build_section(data, fixed_repos):
     lines.append(f"- 已确认修复：**{len(fixed_set)}**")
     lines.append("")
 
-    fixed_items = [v for v in items if v["repo"] in fixed_set]
-    if fixed_items:
+    fixed_items = [v for v in items if v.get("repo_hash") in fixed_set]
+    # 未设置 KEYSTORE_PASSPHRASE 时 repo/path 仍是密文（base64 长串），
+    # 绝不能把密文渲染进 README（既不可读又暴露数据存在）
+    def looks_encrypted(s):
+        s = str(s or "")
+        return len(s) > 40 and "/" not in s  # 仓库名必含 "/"，密文不含
+
+    can_decrypt = not any(looks_encrypted(v.get("repo")) for v in items)
+    if fixed_items and can_decrypt:
         lines.append("#### 已修复并公开的仓库（脱敏展示）")
         lines.append("")
         lines.append("| 仓库 | 文件 | Key（脱敏） | 状态 | 发现日期 |")
@@ -68,12 +87,16 @@ def build_section(data, fixed_repos):
                 f"| {billing} | {v.get('discovered_at','')} |"
             )
         lines.append("")
+    elif fixed_items and not can_decrypt:
+        # 有已修复仓库但无法解密 → 只报数量，绝不把密文写进 README
+        lines.append(f"*已确认修复 {len(fixed_items)} 个仓库（详情需解密密钥，本地运行查看）。*")
+        lines.append("")
     else:
         lines.append("*暂无已确认修复的仓库。*")
         lines.append("")
 
     # 未修复的仓库：只显示 sha256 前 8 位，不暴露仓库名
-    pending_items = [v for v in items if v["repo"] not in fixed_set]
+    pending_items = [v for v in items if v.get("repo_hash") not in fixed_set]
     if pending_items:
         lines.append("#### 已通知待修复（仅展示哈希，保护维护者）")
         lines.append("")
@@ -111,6 +134,8 @@ def main():
 
     data = load_json(VALID_KEYS_JSON, {"total_valid": 0, "items": []})
     fixed_repos = load_json(FIXED_REPOS_JSON, {"repos": []})
+    # 解密敏感字段（未设置 KEYSTORE_PASSPHRASE 时按明文处理）
+    data["items"] = [crypto.decrypt_fields(dict(v), SENSITIVE_FIELDS) for v in data.get("items", [])]
     new_section = build_section(data, fixed_repos)
 
     with open(README, encoding="utf-8") as f:

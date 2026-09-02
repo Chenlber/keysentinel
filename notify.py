@@ -13,6 +13,9 @@ SMTP 配置全部走环境变量，不落盘：
 可选覆盖收件人：MAIL_TO（全局）、MAIL_TO_REPOS（按仓库）
 防重复：history/notified.json 记录已通知 key，默认同一 key 只通知一次；
   设置 RENOTIFY_DAYS=90 可在 90 天后重发（仍未修复时提醒）。
+
+敏感字段加密：notified.json 会 commit 回仓库，其中 repo/path 用 AES-256-GCM 加密，
+密钥取自环境变量 KEYSTORE_PASSPHRASE（存 GitHub Secrets）。未设置该变量时明文存储。
 """
 import json
 import os
@@ -26,7 +29,11 @@ import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import config
+import crypto_util as crypto
 import verifier
+
+# 需要加密存储的字段（定位信息，公开仓库中不应明文）
+SENSITIVE_FIELDS = ("repo", "path")
 
 VERIFIED_FILE = os.path.join(config.DATA_DIR, "verified.jsonl")
 SMTP_HOST = os.environ.get("SMTP_HOST", "")
@@ -52,22 +59,29 @@ RENOTIFY_DAYS = int(os.environ.get("RENOTIFY_DAYS", "0") or 0)
 
 
 def load_notified():
-    """返回 {key_hash: {repo, notified_at, status}}"""
+    """返回 {key_hash: {repo, notified_at, status}}，自动解密敏感字段。"""
     if not os.path.exists(NOTIFIED_JSON):
         return {}
     try:
         with open(NOTIFIED_JSON, encoding="utf-8") as f:
             data = json.load(f)
-        return {r["key_hash"]: r for r in data.get("notified", [])}
+        result = {}
+        for r in data.get("notified", []):
+            result[r["key_hash"]] = crypto.decrypt_fields(dict(r), SENSITIVE_FIELDS)
+        return result
     except Exception:
         return {}
 
 
 def save_notified(notified):
     os.makedirs(HISTORY_DIR, exist_ok=True)
+    records = []
+    for r in notified.values():
+        records.append(crypto.encrypt_fields(dict(r), SENSITIVE_FIELDS))
     payload = {
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "notified": list(notified.values()),
+        "encrypted": crypto.ENABLED,
+        "notified": records,
     }
     with open(NOTIFIED_JSON, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)

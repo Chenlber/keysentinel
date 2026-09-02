@@ -3,6 +3,10 @@
 
 读取 data/verified.jsonl（valid）+ data/billing.jsonl（欠费状态），
 输出脱敏 JSON 供 README 动态展示与后续分析。
+
+敏感字段（repo/path/html_url）用 AES-256-GCM 加密，密钥取自环境变量
+KEYSTORE_PASSPHRASE（存 GitHub Secrets）。该 JSON 会 commit 回公开仓库，
+加密后无人能从仓库数据反推泄露点。未设置口令时明文存储。
 """
 import json
 import os
@@ -11,6 +15,10 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import config
+import crypto_util as crypto
+
+# 需要加密的字段（泄露点定位信息）
+SENSITIVE_FIELDS = ("repo", "path", "html_url")
 
 HISTORY_DIR = os.path.join(config.BASE_DIR, "history")
 VALID_KEYS_JSON = os.path.join(HISTORY_DIR, "valid_keys.json")
@@ -59,19 +67,24 @@ def main():
                 "discovered_at": datetime.now().strftime("%Y-%m-%d"),
             })
 
+    # 加密敏感字段后再落盘（该文件会 commit 回公开仓库）
+    encrypted_items = [crypto.encrypt_fields(dict(v), SENSITIVE_FIELDS) for v in valid]
+
     os.makedirs(HISTORY_DIR, exist_ok=True)
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "encrypted": crypto.ENABLED,
         "total_valid": len(valid),
-        "items": valid,
+        "items": encrypted_items,
     }
     with open(VALID_KEYS_JSON, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
     print(f"已生成 {VALID_KEYS_JSON}")
+    print(f"  加密存储: {'是 (AES-256-GCM)' if crypto.ENABLED else '否（未设置 KEYSTORE_PASSPHRASE）'}")
     print(f"  valid key 总数: {len(valid)}")
     for v in valid:
-        print(f"  - {v['repo']} | {v['key_masked']} | billing={v['billing'] or '-'}")
+        print(f"  - {v['repo_hash']} | {v['key_masked']} | billing={v['billing'] or '-'}")
 
 
 if __name__ == "__main__":

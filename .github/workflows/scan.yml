@@ -66,8 +66,11 @@ jobs:
         run: python3 reporter.py
 
       # 更新历史汇总与 README 动态区块，commit 回仓库
+      # KEYSTORE_PASSPHRASE：加密 history/valid_keys.json 中的 repo/path/html_url
       - name: Update history & README
         if: hashFiles('data/verified.jsonl') != ''
+        env:
+          KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
         run: |
           python3 update_history.py
           python3 update_readme.py

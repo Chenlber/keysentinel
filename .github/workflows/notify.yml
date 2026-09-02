@@ -73,6 +73,7 @@ jobs:
           echo "有效 key 数量: $N"
 
       # 发送邮件 + 创建 Issue（notify.py 内部有防重复机制）
+      # KEYSTORE_PASSPHRASE：用于解密 history/notified.json 的敏感字段并写回密文
       - name: Notify maintainers
         if: steps.check.outputs.valid_count != '0'
         env:
@@ -81,6 +82,7 @@ jobs:
           SMTP_PORT: '465'
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           QUIET: '1'
         run: python3 notify.py --send
 

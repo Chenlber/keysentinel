@@ -1,9 +1,10 @@
 {
   "updated_at": "2026-09-02",
-  "note": "已确认修复（key 已撤销或仓库已清理）的仓库。确认后其仓库名与文件路径才在 README 公开。",
+  "note": "已确认修复（key 已撤销或仓库已清理）的仓库。确认后其仓库名与文件路径才在 README 公开。repo_hash = sha256(repo)[:8]，用于与 valid_keys.json 匹配（不受加密影响）。",
   "repos": [
     {
       "repo": "FLD-TN/MilkteaManage_System",
+      "repo_hash": "d9067f0c",
       "confirmed_at": "2026-09-01",
       "evidence": "维护者邮件回复：已撤销 key、清理仓库、迁移到环境变量"
     }
