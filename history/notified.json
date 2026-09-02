@@ -1,84 +1,85 @@
 {
-  "updated_at": "2026-09-02 11:36",
+  "updated_at": "2026-09-02 14:56",
+  "encrypted": true,
   "notified": [
     {
-      "key_hash": "18fc1c86d2f64dc9",
-      "repo": "FLD-TN/MilkteaManage_System",
-      "path": "src/main/java/com/appsystem/milkteamanage_system/AdminPage/Chatbot.java",
-      "key_masked": "sk-915***5617",
+      "key_hash": "4213c991aed54fdb",
+      "repo": "enc:v1:mDLN5CxIQ9noAR5d/3BZqYKkZZtDnluEu9qnNWKsEh/UExcvm+Nv6uQbhS9x+MliETHjaDpcwX+Mt9pKJzMUlg==",
+      "path": "enc:v1:cV1pYBPtC1SHGprRxJW8KkEYGKUaPsjdOxGuoNxu6nRuEDEEMhmFjt9jg2cXi71PQ/CXD118/dbcfz/SMVWLA0ajNdihxCZi2tlTTGLBzkZYHbIQNrnsNSyY7ig=",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "c07e65b3313e2319",
-      "repo": "abhiram-120/ec2-code",
-      "path": "src/controller/mobile/questionBank.controller.js",
-      "key_masked": "sk-050***ae43",
+      "key_hash": "9bdb45aa903a5c38",
+      "repo": "enc:v1:7OGq1oFvX9p77iQbxqVYXXjZq6Cu+FvL/GX/u5NLMzvYbNd+NsXp6GpfnyR1D2OhfdtKHE6EnF5QYOuyFt136UMXh8gDoac=",
+      "path": "enc:v1:NkiD2k1JThonZ+MIZZKOXBNLDAV+pcArj92sBuk2BwPnItnUoHpXwqLtVLjnJ/BM1WHmMhO6Ni4VgCswCTy1q9WLObg8t0Rm9lUy9HLuNsKzsJbiXpciNHupeYQ7/qQ=",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "773819a7798bb2f7",
-      "repo": "yzhsuisuis/ChatGPT-sdk-java",
-      "path": "src/test/java/cn/bugstack/chatgpt/test/ApiTest.java",
-      "key_masked": "sk-a3b***6ff8",
+      "key_hash": "05425853d0363a6c",
+      "repo": "enc:v1:TourpMhLVu5Wf5jZwIK+2bSjvbYroVTP0t6M/yinOOW4FyoKs5qviiBh3dBiodGMN1Wv3wZTS8TAn5APjRPzfyUUVdbAVr8N",
+      "path": "enc:v1:8JrGfNagW/EQnjit68n22NhsPTAMhEl+s+0DQZZ4z+CV90jrRp9DQsF2TTyXxxBsU2uYZdeB7t6pbFKu",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "e4a99c6a2f30f9d9",
-      "repo": "abdullahktk760/transcription",
-      "path": "config/prism.php",
-      "key_masked": "sk-593***5d82",
+      "key_hash": "6c5df4fe96bb4549",
+      "repo": "enc:v1:WEb+rS08x96BL5Y2klvjjF6rvYhSpXI6XbbPffPLucQMa7glPoBBUQtB6hv0+8slNof5fMP4k7eTz+5otFPGFem7PljzTR5ITQ==",
+      "path": "enc:v1:AlLVYFFEhF90j+Xkrhqppd30CjnPktf8u8U/ZSz6WkGf0XC4znhZuT+u0B4S/XN13kCa3rNIy03OyC22F8Tm7awBbcQALDbLfNUTm0h6/Vi7iSI=",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "1b75aacbc3f1cf85",
-      "repo": "tabrej-the-developer/mydiaree",
-      "path": "application/controllers/Observation.php",
-      "key_masked": "sk-d1f***be5c",
+      "key_hash": "e6315459b23ee90a",
+      "repo": "enc:v1:yKuuveDv8MgDB/nVUNaoLNUSN7EcCl9hSSCwYGTO21si2SafSoYCto3XYt+ISHFiCvVjJ74gHbtoNCRKrsHkxVszuNTf",
+      "path": "enc:v1:jEKa+YM3xZQH8EnvvcnSWtcnI11CpQZqe4B2UpwkvxdezkINue22F0+fFh4Kg7ZHbJQ58TW2F22wPILbsj2J9GDA",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "8075b527fb368a49",
-      "repo": "JawherBalti/wbcc_extranet",
-      "path": "app/libraries/test.php",
-      "key_masked": "sk-4c8***ac1e",
+      "key_hash": "012d59dacb9aa4f7",
+      "repo": "enc:v1:KDMScLyz4SmDCFisQMqpVHPrpL5J9ZA1WaQHdJaCwXYyVtLcamis8ctmRS40qqZ4hY6jKB7wiUJaj1eTh+AaRNXtNNqX3mR2lWdaU3Kg",
+      "path": "enc:v1:KkHwcQRowYoAUSSqhr9xsfiVTIU31I7HisENpj3mMLLaHMPVv/x5ic5ARvANNaF88JKJBeq81eHmrepVwiPORNrTMtySebNy5bjS2uaZV0NlKlT1",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "5975e718b17f488f",
-      "repo": "Abdallah-Salah7/Graduation-Project",
-      "path": "Aoun.BLL/Services/Chat/AISmartService.cs",
-      "key_masked": "sk-134***54c7",
+      "key_hash": "ab4a4e87c7efe7ef",
+      "repo": "enc:v1:uYZ12++WQ6p78ea55w1UhcyjW25vd1viX6QiMhxbk9GyN5H8wrNLszD5UhnQlLFElc9SRR53d8DDABZQs7R9Q0An",
+      "path": "enc:v1:hBGwLY2DWS8/19yyPk1AbrHwvD1P0eBeTaTjtGlggWw8PcqY0aECrJYNnCTDUx5SzYEI1wn1spm5/8KQNo4lMhrZVuQ1cH1GZw==",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "e1e03d0261314623",
-      "repo": "fsawadogo/sqordia-repo",
-      "path": "Planhop4.8/Helper/AIHelper.cs",
-      "key_masked": "sk-30e***0878",
+      "key_hash": "72a24c35cb466552",
+      "repo": "enc:v1:TOEVciqqMpXX8WTqn4F9V1XsZgTFfFciboIw7pSRkHAaSccMFq3eJC2iOCSxYkd40DKvjSTfDIQ=",
+      "path": "enc:v1:X0jR4vHkBJ68EIQKeZ7nQFBOYVf+ZS1UlH63t0MJzC9ZYa9Tpc335SE9qPP6maTNMXUkWoF1a59kMFZMeVP+vuiFFgjlrDQREnMYwnrowwvoamyKw822tPWSyYE=",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "43d3d342a8f6dc30",
-      "repo": "mac383/Utemy",
-      "path": "Salam-Hack-Back-End/Api_Layer/Util/GptService.cs",
-      "key_masked": "sk-087***c24d",
+      "key_hash": "39c334657150e74c",
+      "repo": "enc:v1:gXYsk9lUihZBMnfaJEpttDLxG5q2Q4/1nKLdqbFmXClas1de6FcUyEc3I0QA2fVdIfSnDj6+rxWLU+3XZYFDqlwbpEYlpiSsyLMnIas=",
+      "path": "enc:v1:CFWxTu0H9FfH1RcBJoEBEQ0esGRpUqE43Y0bsAKhw22nbuydgcvGBjL2qhmZYIxzYUtJ9nlWNuiDfTWiFl6VFQHuOuw=",
+      "key_masked": "sk-***",
       "notified_at": "2026-09-02",
       "channels": "mail+issue"
     },
     {
-      "key_hash": "a3eec563fbed833c",
-      "repo": "RobertAlexBarbu/RestaurantMenuApp",
-      "path": "WebAPI/WebAPI/Program.cs",
-      "key_masked": "sk-2b0***67a3",
-      "notified_at": "2026-09-02",
+      "key_hash": "d9067f0c2c49347f",
+      "repo": "enc:v1:o/4ag+onqH590mkvcYN8CntBYbfldcn4QYsm8UsdL4Km8MOIq2A5ahY3GmnFthygXN3m6Juv2c0ov98HPjdY5G0eKVYpu5w=",
+      "path": "enc:v1:9UgHJH9fhcAchpmNMEq2RGZP69sza1xYNBFO5Y5PX+M4k7+CVMsWmI4e9iBJj1CH67IAuBp4qshCx5hnuQbpatTttcKgUOOtx7JJ/d9HPaNr4d0mqaKCRVYqOdJoQWjU91HdWvSFs7hNsLkl5/xpvj2DzQ==",
+      "key_masked": "sk-***",
+      "notified_at": "2026-08-31",
       "channels": "mail+issue"
     }
   ]
