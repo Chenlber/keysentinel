@@ -59,18 +59,32 @@ RENOTIFY_DAYS = int(os.environ.get("RENOTIFY_DAYS", "0") or 0)
 
 
 def load_notified():
-    """返回 {key_hash: {repo, notified_at, status}}，自动解密敏感字段。"""
+    """返回 {key_hash: {repo, notified_at, status}}，自动解密敏感字段。
+
+    容错：损坏/缺字段的记录逐条跳过，不影响整体历史。
+    绝不因单条异常返回空字典（否则会导致重复通知）。
+    """
     if not os.path.exists(NOTIFIED_JSON):
         return {}
     try:
         with open(NOTIFIED_JSON, encoding="utf-8") as f:
             data = json.load(f)
-        result = {}
-        for r in data.get("notified", []):
-            result[r["key_hash"]] = crypto.decrypt_fields(dict(r), SENSITIVE_FIELDS)
-        return result
-    except Exception:
+    except Exception as e:
+        print(f"警告：读取 {NOTIFIED_JSON} 失败（{e}），视为无历史", file=sys.stderr)
         return {}
+    result = {}
+    for r in data.get("notified", []):
+        h = r.get("key_hash")
+        if not h:
+            print("警告：跳过缺 key_hash 的通知记录", file=sys.stderr)
+            continue
+        try:
+            result[h] = crypto.decrypt_fields(dict(r), SENSITIVE_FIELDS)
+        except Exception as e:
+            # 解密失败：保留原记录（密文），确保 key_hash 仍可用于去重
+            print(f"警告：记录 {h} 解密失败，保留密文用于去重（{e}）", file=sys.stderr)
+            result[h] = r
+    return result
 
 
 def save_notified(notified):

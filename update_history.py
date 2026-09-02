@@ -49,14 +49,19 @@ def main():
                 r = json.loads(line)
                 billing[r["key_hash"]] = r.get("status", "")
 
-    # 读 valid key
+    # 读 valid key（按 repo+path 去重：同一 key 可能命中多个文件）
     valid = []
+    seen = set()
     with open(os.path.join(config.DATA_DIR, "verified.jsonl"), encoding="utf-8") as f:
         for line in f:
             r = json.loads(line)
             if r.get("status") != "valid":
                 continue
             h = r["key_hash"]
+            dedup_key = (r.get("repo", ""), r.get("path", ""))
+            if dedup_key in seen:
+                continue
+            seen.add(dedup_key)
             valid.append({
                 "repo": r["repo"],
                 "repo_hash": repo_hash(r["repo"]),
