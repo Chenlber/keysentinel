@@ -22,8 +22,8 @@ KeySentinel 扫描 GitHub 公开仓库中的 API Key（OpenAI / DeepSeek / Moons
 ## 工作流程
 
 ```
-crawler ──> extractor ──> verifier ──> reporter ──> notify
-  搜索+拉取     正则提取      零消耗验证     去重+报告       邮件通知
+crawler ──> extractor ──> verifier ──> billing ──> reporter ──> notify
+  搜索+拉取     正则提取      零消耗验证     欠费确认       去重+报告     邮件通知
 ```
 
 | 阶段 | 脚本 | 输入 → 输出 | 说明 |
@@ -31,6 +31,7 @@ crawler ──> extractor ──> verifier ──> reporter ──> notify
 | 采集 | `crawler.py` | → `data/raw_items.jsonl` | 关键词 x 语言分片搜索，突破单查询 4000 仓库限制；限速 + 退避重试；断点续跑 |
 | 提取 | `extractor.py` | `raw_items.jsonl` → `data/keys.jsonl` | 四类正则提取；占位符硬过滤；官方 base_url 路由信号 |
 | 验证 | `verifier.py` | `keys.jsonl` → `data/verified.jsonl` | 多服务路由，仅调用 `GET /models` 零消耗端点 |
+| 欠费确认 | `billing_check.py` | `verified.jsonl`(valid) → `data/billing.jsonl` | 对 valid key 发送单条"你好"（`max_tokens=1`），区分 ok / billing（欠费）/ invalid；支持 `--key` 手动指定 |
 | 报告 | `reporter.py` | `verified.jsonl` → `out/` | sha256 去重归并；key 掩码脱敏；按状态排序 |
 | 通知 | `notify.py` | `verified.jsonl` → SMTP 邮件 + GitHub Issue | 自动提取维护者邮箱；邮件含脱敏详情，Issue 仅隐晦提醒（不暴露 key）；默认 dry-run，`--send` 才执行 |
 
@@ -106,6 +107,29 @@ python3 notify.py
 - `reason`：验证响应详情，如可用模型列表
 - `locations`：同一 key 出现的全部仓库位置
 
+<!-- KEYS_START -->
+
+### 已发现的有效 key（自动更新）
+
+**累计发现 10 个有效 key**（零消耗验证，脱敏展示）
+
+| 仓库 | 文件 | Key（脱敏） | 状态 | 发现日期 |
+|---|---|---|---|---|
+| [FLD-TN/MilkteaManage_System](https://github.com/FLD-TN/MilkteaManage_System) | `src/main/java/com/appsystem/milkteamanage_system/AdminPage/Chatbot.java` | `sk-915***5617` | 欠费 | 2026-09-02 |
+| [abhiram-120/ec2-code](https://github.com/abhiram-120/ec2-code) | `src/controller/mobile/questionBank.controller.js` | `sk-050***ae43` | 欠费 | 2026-09-02 |
+| [yzhsuisuis/ChatGPT-sdk-java](https://github.com/yzhsuisuis/ChatGPT-sdk-java) | `src/test/java/cn/bugstack/chatgpt/test/ApiTest.java` | `sk-a3b***6ff8` | 欠费 | 2026-09-02 |
+| [abdullahktk760/transcription](https://github.com/abdullahktk760/transcription) | `config/prism.php` | `sk-593***5d82` | 欠费 | 2026-09-02 |
+| [tabrej-the-developer/mydiaree](https://github.com/tabrej-the-developer/mydiaree) | `application/controllers/Observation.php` | `sk-d1f***be5c` | 欠费 | 2026-09-02 |
+| [JawherBalti/wbcc_extranet](https://github.com/JawherBalti/wbcc_extranet) | `app/libraries/test.php` | `sk-4c8***ac1e` | 欠费 | 2026-09-02 |
+| [Abdallah-Salah7/Graduation-Project](https://github.com/Abdallah-Salah7/Graduation-Project) | `Aoun.BLL/Services/Chat/AISmartService.cs` | `sk-134***54c7` | 欠费 | 2026-09-02 |
+| [fsawadogo/sqordia-repo](https://github.com/fsawadogo/sqordia-repo) | `Planhop4.8/Helper/AIHelper.cs` | `sk-30e***0878` | 欠费 | 2026-09-02 |
+| [mac383/Utemy](https://github.com/mac383/Utemy) | `Salam-Hack-Back-End/Api_Layer/Util/GptService.cs` | `sk-087***c24d` | 欠费 | 2026-09-02 |
+| [RobertAlexBarbu/RestaurantMenuApp](https://github.com/RobertAlexBarbu/RestaurantMenuApp) | `WebAPI/WebAPI/Program.cs` | `sk-2b0***67a3` | 欠费 | 2026-09-02 |
+
+*数据源：`history/valid_keys.json`，由 `update_history.py` 生成。*
+
+<!-- KEYS_END -->
+
 ## GitHub Actions 自动化
 
 项目自带 `.github/workflows/scan.yml`，支持 CI 自动化检测：
@@ -138,8 +162,8 @@ python3 notify.py --send   # 确认后发送
 
 ```bash
 # 小批验证（不改 crawler 逻辑时）：
-# 修改后只需重跑 extractor → verifier → reporter
-python3 extractor.py && python3 verifier.py && python3 reporter.py
+# 修改后只需重跑 extractor → verifier → billing → reporter
+python3 extractor.py && python3 verifier.py && python3 billing_check.py && python3 reporter.py
 ```
 
 ## 免责声明

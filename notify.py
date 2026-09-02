@@ -32,6 +32,14 @@ SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASS = os.environ.get("SMTP_PASS", "")
 SMTP_FROM = os.environ.get("SMTP_FROM", SMTP_USER)
 MAIL_TO_OVERRIDE = os.environ.get("MAIL_TO", "")
+# 按仓库指定收件人（格式 "repo/a=email1,repo/b=email2"，逗号分隔）
+MAIL_TO_REPOS = {}
+for _kv in os.environ.get("MAIL_TO_REPOS", "").split(","):
+    if "=" in _kv:
+        _repo, _email = _kv.split("=", 1)
+        MAIL_TO_REPOS[_repo.strip()] = _email.strip()
+# 跳过的仓库（逗号分隔，如 SKIP_REPOS="a/b,c/d"）
+SKIP_REPOS = {r.strip() for r in os.environ.get("SKIP_REPOS", "").split(",") if r.strip()}
 
 
 def mask(key):
@@ -175,7 +183,7 @@ def main():
     with open(VERIFIED_FILE, encoding="utf-8") as f:
         for line in f:
             rec = json.loads(line)
-            if rec.get("status") == "valid":
+            if rec.get("status") == "valid" and rec.get("repo") not in SKIP_REPOS:
                 valid_recs.append(rec)
 
     if not valid_recs:
@@ -185,7 +193,11 @@ def main():
     print(f"待通知 {len(valid_recs)} 条 valid key\n")
     sent_mail = sent_issue = 0
     for rec in valid_recs:
-        to_addr = MAIL_TO_OVERRIDE or get_maintainer_email(session, rec["repo"])
+        to_addr = (
+            MAIL_TO_REPOS.get(rec["repo"])
+            or MAIL_TO_OVERRIDE
+            or get_maintainer_email(session, rec["repo"])
+        )
         print(f"=== {rec['repo']} ===")
         print(f"  收件人: {to_addr or '(未找到邮箱，跳过)'}")
         print(f"  文件:   {rec['path']}")

@@ -16,8 +16,9 @@ import extractor
 import notify
 import reporter
 import verifier
+import billing_check
 
-STAGES = ["crawler", "extractor", "verifier", "reporter", "notify"]
+STAGES = ["crawler", "extractor", "verifier", "billing", "reporter", "notify"]
 
 
 def main():
@@ -30,7 +31,7 @@ def main():
 
     modules = STAGES if args.stage == "all" else [args.stage]
     mods = {"crawler": crawler, "extractor": extractor, "verifier": verifier,
-            "reporter": reporter, "notify": notify}
+            "billing": billing_check, "reporter": reporter, "notify": notify}
     for name in modules:
         print(f"\n########## Stage: {name} ##########", flush=True)
         if name == "notify" and args.send:

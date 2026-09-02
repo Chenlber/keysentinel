@@ -6,6 +6,7 @@
 # 流水线产物（含明文 key，绝不能入库）
 data/
 out/
+.temp/
 
 # 运行时
 __pycache__/

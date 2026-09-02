@@ -141,5 +141,19 @@ PREFIX_ROUTES = {
 # 裸 sk- 前缀存在歧义（OpenAI/DeepSeek/Moonshot 共用），依次尝试，首个 200 即命中
 SK_FALLBACK = ["openai", "deepseek", "moonshot"]
 
+# 欠费确认（billing_check.py 使用）：
+# 先查可用模型再发请求：不硬编码唯一模型名（模型可能失效/下线），
+# 而是先零消耗 GET models_url 拉取该 key 实际可用的模型列表，
+# 按 prefer（便宜优先）匹配，匹配不到用列表第一个。
+# 仅发送单条 "你好"（max_tokens=1），成本可忽略。
+CHAT_ENDPOINTS = {
+    "openai":     {"chat_url": "https://api.openai.com/v1/chat/completions",       "models_url": "https://api.openai.com/v1/models",          "prefer": ["gpt-4o-mini", "gpt-4.1-mini", "gpt-3.5-turbo"], "auth": "bearer"},
+    "deepseek":   {"chat_url": "https://api.deepseek.com/chat/completions",        "models_url": "https://api.deepseek.com/models",           "prefer": ["deepseek-chat"],                                 "auth": "bearer"},
+    "moonshot":   {"chat_url": "https://api.moonshot.cn/v1/chat/completions",      "models_url": "https://api.moonshot.cn/v1/models",         "prefer": ["moonshot-v1-8k", "kimi-latest"],                 "auth": "bearer"},
+    "groq":       {"chat_url": "https://api.groq.com/openai/v1/chat/completions",  "models_url": "https://api.groq.com/openai/v1/models",     "prefer": ["llama-3.1-8b-instant", "llama3-8b-8192"],        "auth": "bearer"},
+    "openrouter": {"chat_url": "https://openrouter.ai/api/v1/chat/completions",    "models_url": "https://openrouter.ai/api/v1/models",       "prefer": ["meta-llama/llama-3.1-8b-instruct:free"],          "auth": "bearer"},
+    "anthropic":  {"chat_url": "https://api.anthropic.com/v1/messages",            "models_url": "https://api.anthropic.com/v1/models",       "prefer": ["claude-3-5-haiku-latest", "claude-3-haiku-20240307"], "auth": "anthropic"},
+}
+
 VERIFY_TIMEOUT = 15
 VERIFY_INTERVAL = 0.5  # 串行验证间隔，防 429
